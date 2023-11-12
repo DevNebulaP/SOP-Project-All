@@ -3,25 +3,29 @@ package com.example.chat_disro;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
-@RequestMapping("/api/chats")
 public class ChatController {
     @Autowired
     private ChatService chatService;
 
-    @GetMapping
+    @GetMapping("/chats")
     public List<Chat> getAllChats() {
         return chatService.getAllChats();
     }
 
-    @PostMapping
-    public ResponseEntity<?> addChat(@RequestBody Chat chat) {
+    @PostMapping("/chats")
+    public ResponseEntity<?> addChat(@RequestBody MultiValueMap<String, String> formdata) {
+        Map<String, String> d = formdata.toSingleValueMap();
+
+        Chat chat = new Chat(d.get("roomId"), new User(d.get("userId"), d.get("username"), d.get("image")), d.get("text"), null);
         System.out.println(chat);
         if (chat.getText() != null && !chat.getText().isEmpty()) {
             // สร้าง timestamp โดยอัตโนมัติที่เป็นปัจจุบัน

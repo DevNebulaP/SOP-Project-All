@@ -30,7 +30,7 @@ public class ServerController {
     private Members members = new Members();
     private Categoriess categoriess =new Categoriess();
     private Rooms rooms = new Rooms();
-    private ArrayList<String> categories = new ArrayList<String>();
+    private ArrayList<Categories> categories = new ArrayList<Categories>();
     private ArrayList<Member> startMember = new ArrayList<Member>();
     private ArrayList<Member> oldMember = new ArrayList<Member>();
     private ArrayList<Member> AllMember = new ArrayList<Member>();
@@ -60,7 +60,9 @@ public class ServerController {
         Member member = memberService.createMember(
                 new Member(null,d.get("userId"), d.get("username"), null, "builder")
         );
+        startMember = new ArrayList<Member>();
         this.startMember.add(member);
+        Categorieslist = new ArrayList<Categories>();
         Server server =serverService.createServer(
                 new Server(null, d.get("name"), d.get("description"), null, Categorieslist , this.startMember)
         );
@@ -71,9 +73,12 @@ public class ServerController {
     public ResponseEntity<Server> createCategories(@RequestBody MultiValueMap<String, String> formdata, @PathVariable("serverId") String serverId){
         Map<String, String> d = formdata.toSingleValueMap();
         Server server = serverService.findById(serverId);
+        Roomlist = new ArrayList<Room>();
         Categories categories = categoriesService.createCategories(
                 new Categories(null, d.get("name"), Roomlist)
         );
+        Categorieslist = new ArrayList<Categories>();
+        Categorieslist = server.getCategories();
         Categorieslist.add(categories);
         Server servernew =serverService.updateServer(
                 new Server(serverId, server.getName(), server.getDescription(), server.getImage(), Categorieslist , server.getMember())
@@ -89,9 +94,11 @@ public class ServerController {
                 new Room(null, d.get("name"), d.get("type"))
         );
         Categorieslist = server.getCategories();
-        Roomlist.add(room);
+
         for (int i = 0; i < Categorieslist.size(); i++) {
             if (Categorieslist.get(i).get_id().equals(d.get("categoriesId"))) {
+                Roomlist = Categorieslist.get(i).getRoom();
+                Roomlist.add(room);
                 Categorieslist.get(i).setRoom(Roomlist);
             }
         }
@@ -160,7 +167,7 @@ public class ServerController {
             this.oldMember.add(member);
             Server serverNew = serverService.updateServer((
                     new Server(serverId, server.getName(), server.getDescription(), server.getImage(), server.getCategories(), this.oldMember)
-                    ));
+            ));
             return "join success";
         }
         System.out.println(0);

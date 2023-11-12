@@ -13,12 +13,12 @@ public class Chat implements Serializable {
     @Id
     private String _id; // ใช้เป็น ObjectId ของ MongoDB
     private String roomId; // รหัสห้องแชท
-    private Object user; //ผู้ใช้ที่ส่งข้อความ
+    private User user; //ผู้ใช้ที่ส่งข้อความ
     private String text; // ข้อความแชท
     private Date dateTime; // วันที่และเวลา
 
     // Constructor สำหรับคลาส Chat
-    public Chat(String roomId, Object user,String text, Date dateTime) {
+    public Chat(String roomId, User user,String text, Date dateTime) {
         this.roomId = roomId;
         this.user = user;
         this.text = text;
