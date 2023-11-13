@@ -5,11 +5,13 @@ import com.sopproject.paymentservice.services.PayPalPaymentService;
 import com.paypal.api.payments.Links;
 import com.paypal.base.rest.PayPalRESTException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "*", allowedHeaders = "*")
@@ -27,7 +29,14 @@ public class PayPalPaymentController {
     }
 
     @RequestMapping(value = "/payPremium", method = RequestMethod.POST)
-    public String payment(@RequestBody PaymentRequest paymentRequest) {
+    public String payment(@RequestBody MultiValueMap<String, String>  formData) {
+        Map<String, String> d = formData.toSingleValueMap();
+        PaymentRequest paymentRequest = PaymentRequest.builder()
+                .description(d.get("description"))
+                .orderItem(d.get("orderItem"))
+                .userId(d.get("userId"))
+                .build();
+
         if(paymentRequest.getUserId() == null || paymentRequest.getOrderItem() == null){
             throw new IllegalArgumentException("Bad request");
         }
@@ -43,7 +52,7 @@ public class PayPalPaymentController {
                     entity.setOrderStatus(OrderStatus.CREATED);
                     entity.setUserId(paymentRequest.getUserId());
                     orderRepository.save(entity);
-                    return "redirect:"+link.getHref();
+                    return link.getHref();
                 }
             }
 
